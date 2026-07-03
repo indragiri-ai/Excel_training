@@ -1,0 +1,1421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Excel Workbook — Course Guide, Shortcuts &amp; Formula Generator</title>
+<meta name="description" content="A complete Excel reference for BBA &amp; MBA students: step-by-step lessons, categorised shortcuts, tips &amp; tricks, and a formula generator that writes the exact formula for you." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   THE EXCEL WORKBOOK — design tokens
+   Grounded in the spreadsheet: canvas-white paper, hairline
+   grid, deep emerald primary, amber "highlighted cell" accent,
+   monospace doing real work in the formula bar.
+   ============================================================ */
+:root{
+  --paper:#F6F8F5;         /* cool canvas white, not cream */
+  --cell:#FFFFFF;          /* card / cell surface */
+  --ink:#132019;           /* deep pine-black text */
+  --muted:#586B60;         /* sage-gray secondary text */
+  --faint:#8DA093;         /* tertiary / captions */
+  --grid:#E2E7E1;          /* hairline grid line */
+  --grid-2:#EDF1EC;        /* lighter grid line */
+  --pine:#137A54;          /* primary emerald accent */
+  --pine-deep:#0C4A36;     /* dark green (dark surfaces) */
+  --pine-ink:#0A3A2A;      /* darkest green */
+  --pine-soft:#E4F1EA;     /* green tint fill */
+  --amber:#D98A18;         /* highlighted-cell amber */
+  --amber-soft:#FBEFD8;    /* amber tint fill */
+  --rose:#C0492E;          /* error / #N/A red-clay */
+  --rose-soft:#F7E4DE;
+  --radius:14px;
+  --radius-sm:9px;
+  --shadow:0 1px 0 var(--grid), 0 10px 30px -18px rgba(12,74,54,.32);
+  --shadow-sm:0 1px 2px rgba(19,32,25,.05), 0 4px 14px -10px rgba(12,74,54,.28);
+  --sans:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --display:"Space Grotesk","Inter",system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,"SF Mono",Consolas,monospace;
+  --sidebar-w:264px;
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  font-family:var(--sans);
+  color:var(--ink);
+  background:var(--paper);
+  background-image:
+    linear-gradient(var(--grid-2) 1px,transparent 1px),
+    linear-gradient(90deg,var(--grid-2) 1px,transparent 1px);
+  background-size:26px 26px;
+  background-position:-1px -1px;
+  font-size:16px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:inherit}
+h1,h2,h3,h4{font-family:var(--display);font-weight:600;line-height:1.15;letter-spacing:-.01em;margin:0}
+p{margin:0}
+button{font-family:inherit}
+::selection{background:var(--amber-soft)}
+
+.mono{font-family:var(--mono)}
+
+/* ---------- layout shell ---------- */
+.shell{display:flex;min-height:100vh}
+
+/* ---------- sidebar (sheet tabs) ---------- */
+.sidebar{
+  width:var(--sidebar-w);
+  flex:0 0 var(--sidebar-w);
+  position:sticky;top:0;align-self:flex-start;
+  height:100vh;
+  background:var(--cell);
+  border-right:1px solid var(--grid);
+  display:flex;flex-direction:column;
+  z-index:40;
+}
+.brand{
+  padding:22px 22px 18px;
+  border-bottom:1px solid var(--grid);
+}
+.brand-mark{
+  display:flex;align-items:center;gap:11px;
+}
+.brand-fx{
+  width:34px;height:34px;border-radius:9px;flex:0 0 34px;
+  background:linear-gradient(150deg,var(--pine),var(--pine-deep));
+  color:#fff;font-family:var(--mono);font-weight:600;font-size:15px;
+  display:grid;place-items:center;font-style:italic;
+  box-shadow:0 4px 12px -4px rgba(12,74,54,.5);
+}
+.brand-name{font-family:var(--display);font-weight:600;font-size:16px;letter-spacing:-.01em;line-height:1.1}
+.brand-sub{font-size:11.5px;color:var(--faint);letter-spacing:.02em;margin-top:1px}
+
+.nav{padding:12px 12px 8px;overflow-y:auto;flex:1}
+.nav-label{
+  font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--faint);font-weight:600;padding:12px 12px 6px;
+}
+.tab{
+  display:flex;align-items:center;gap:11px;width:100%;
+  padding:9px 12px;border:none;background:none;cursor:pointer;
+  border-radius:9px;color:var(--muted);font-size:14.5px;font-weight:500;
+  text-align:left;transition:background .15s,color .15s;position:relative;
+}
+.tab:hover{background:var(--pine-soft);color:var(--pine-deep)}
+.tab .ico{width:18px;flex:0 0 18px;color:currentColor;opacity:.9}
+.tab.active{background:var(--pine-soft);color:var(--pine-deep);font-weight:600}
+.tab.active::before{
+  content:"";position:absolute;left:-12px;top:8px;bottom:8px;width:3px;
+  border-radius:0 3px 3px 0;background:var(--pine);
+}
+.sidebar-foot{
+  padding:14px 18px;border-top:1px solid var(--grid);
+  font-size:11.5px;color:var(--faint);line-height:1.5;
+}
+
+/* ---------- main ---------- */
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+.topbar{
+  display:none;position:sticky;top:0;z-index:35;
+  align-items:center;gap:12px;
+  padding:12px 16px;background:rgba(246,248,245,.9);
+  backdrop-filter:blur(8px);border-bottom:1px solid var(--grid);
+}
+.hamburger{
+  width:40px;height:40px;border-radius:10px;border:1px solid var(--grid);
+  background:var(--cell);cursor:pointer;display:grid;place-items:center;color:var(--ink)
+}
+.topbar .brand-name{font-size:15px}
+
+.view{display:none;animation:rise .32s cubic-bezier(.2,.7,.3,1)}
+.view.active{display:block}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+.wrap{max-width:960px;margin:0 auto;padding:40px 32px 96px}
+.wrap-wide{max-width:1100px}
+
+/* ---------- shared section bits ---------- */
+.eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:var(--mono);font-size:12px;font-weight:500;
+  color:var(--pine);text-transform:uppercase;letter-spacing:.1em;
+  background:var(--pine-soft);padding:5px 11px;border-radius:100px;
+}
+.section-head{margin-bottom:26px}
+.section-head h2{font-size:clamp(26px,3.4vw,36px);margin:16px 0 10px}
+.section-head p{color:var(--muted);max-width:62ch;font-size:15.5px}
+
+.chip{
+  display:inline-flex;align-items:center;gap:6px;
+  font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.03em;
+  padding:3px 9px;border-radius:6px;line-height:1.4;white-space:nowrap;
+}
+.chip-bba{background:var(--pine-soft);color:var(--pine-deep)}
+.chip-mba{background:var(--amber-soft);color:#8a5410}
+
+/* code / formula styling */
+.formula{
+  font-family:var(--mono);font-size:14px;background:#0C1D16;color:#E9F3EE;
+  padding:12px 14px;border-radius:var(--radius-sm);overflow-x:auto;
+  display:block;white-space:pre;line-height:1.5;border:1px solid #16362a;
+}
+.formula .fx{color:#7BD0A6}
+code.inl{
+  font-family:var(--mono);font-size:.88em;background:var(--pine-soft);
+  color:var(--pine-deep);padding:1px 6px;border-radius:5px;font-weight:500;
+}
+kbd{
+  font-family:var(--mono);font-size:12.5px;font-weight:600;
+  background:var(--cell);border:1px solid var(--grid);
+  border-bottom-width:2px;border-radius:6px;padding:2px 7px;color:var(--ink);
+  white-space:nowrap;line-height:1.9;
+}
+
+/* ============================================================
+   HOME
+   ============================================================ */
+.hero{position:relative;padding:56px 0 20px}
+.hero h1{font-size:clamp(34px,5.4vw,58px);letter-spacing:-.025em;line-height:1.02}
+.hero h1 .hl{
+  background:linear-gradient(180deg,transparent 62%,var(--amber-soft) 62%);
+  padding:0 2px;
+}
+.hero-lead{margin-top:20px;font-size:clamp(16px,2vw,19px);color:var(--muted);max-width:56ch}
+.hero-cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+.btn{
+  display:inline-flex;align-items:center;gap:9px;
+  padding:12px 20px;border-radius:11px;font-weight:600;font-size:15px;
+  cursor:pointer;border:1px solid transparent;transition:transform .12s,box-shadow .2s,background .2s;
+  text-decoration:none;
+}
+.btn:active{transform:translateY(1px)}
+.btn-primary{background:var(--pine);color:#fff;box-shadow:0 8px 20px -10px rgba(19,122,84,.7)}
+.btn-primary:hover{background:var(--pine-deep)}
+.btn-ghost{background:var(--cell);border-color:var(--grid);color:var(--ink)}
+.btn-ghost:hover{border-color:var(--pine);color:var(--pine-deep)}
+
+/* mini formula-bar demo in hero */
+.fxbar{
+  margin-top:38px;background:var(--cell);border:1px solid var(--grid);
+  border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;max-width:640px;
+}
+.fxbar-top{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--grid);background:var(--paper)}
+.fxbar-cell{
+  font-family:var(--mono);font-size:12.5px;font-weight:600;color:var(--muted);
+  border:1px solid var(--grid);background:var(--cell);border-radius:6px;padding:3px 9px;
+}
+.fxbar-fx{font-family:var(--mono);font-style:italic;font-weight:600;color:var(--pine);font-size:15px}
+.fxbar-line{width:1px;height:18px;background:var(--grid)}
+.fxbar-body{padding:16px;font-family:var(--mono);font-size:14px;min-height:52px}
+.fxbar-body .type{color:var(--ink)}
+.caret{display:inline-block;width:2px;height:1.05em;background:var(--pine);vertical-align:-2px;margin-left:1px;animation:blink 1.05s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+
+.stat-row{display:flex;flex-wrap:wrap;gap:14px;margin-top:44px}
+.stat{
+  flex:1;min-width:150px;background:var(--cell);border:1px solid var(--grid);
+  border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow-sm);
+}
+.stat b{font-family:var(--display);font-size:30px;display:block;color:var(--pine-deep);letter-spacing:-.02em}
+.stat span{font-size:13px;color:var(--muted)}
+
+/* track cards */
+.tracks{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px}
+.track{
+  background:var(--cell);border:1px solid var(--grid);border-radius:var(--radius);
+  padding:24px;box-shadow:var(--shadow-sm);position:relative;overflow:hidden;
+}
+.track::after{content:"";position:absolute;inset:0 0 auto auto;width:120px;height:120px;
+  background:radial-gradient(circle at 100% 0,var(--pine-soft),transparent 70%);pointer-events:none}
+.track.mba::after{background:radial-gradient(circle at 100% 0,var(--amber-soft),transparent 70%)}
+.track h3{font-size:20px;display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.track p{color:var(--muted);font-size:14px;margin-bottom:14px}
+.track ul{margin:0;padding-left:0;list-style:none;display:flex;flex-wrap:wrap;gap:7px}
+.track li{font-size:12.5px;font-family:var(--mono);background:var(--paper);border:1px solid var(--grid);padding:3px 9px;border-radius:6px;color:var(--muted)}
+
+.home-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px}
+.qcard{
+  display:flex;gap:14px;align-items:flex-start;text-align:left;
+  background:var(--cell);border:1px solid var(--grid);border-radius:var(--radius);
+  padding:20px;cursor:pointer;box-shadow:var(--shadow-sm);transition:transform .15s,box-shadow .2s,border-color .2s;
+  width:100%;font:inherit;color:inherit;
+}
+.qcard:hover{transform:translateY(-2px);border-color:var(--pine);box-shadow:0 14px 34px -20px rgba(12,74,54,.5)}
+.qcard .qi{
+  width:42px;height:42px;flex:0 0 42px;border-radius:11px;display:grid;place-items:center;
+  background:var(--pine-soft);color:var(--pine-deep);
+}
+.qcard h4{font-size:16px;margin-bottom:3px}
+.qcard p{font-size:13.5px;color:var(--muted)}
+
+/* ============================================================
+   COURSE GUIDE
+   ============================================================ */
+.toolbar{
+  display:flex;flex-wrap:wrap;gap:12px;align-items:center;
+  margin-bottom:24px;position:sticky;top:0;z-index:10;
+  padding:14px 0;background:linear-gradient(var(--paper) 70%,transparent);
+}
+.seg{display:inline-flex;background:var(--cell);border:1px solid var(--grid);border-radius:11px;padding:4px;gap:2px}
+.seg button{
+  border:none;background:none;cursor:pointer;padding:7px 15px;border-radius:8px;
+  font-weight:600;font-size:13.5px;color:var(--muted);transition:.15s;
+}
+.seg button.on{background:var(--pine);color:#fff}
+.seg button.on.amber{background:var(--amber)}
+.search{
+  flex:1;min-width:200px;display:flex;align-items:center;gap:9px;
+  background:var(--cell);border:1px solid var(--grid);border-radius:11px;padding:9px 14px;
+}
+.search input{border:none;background:none;outline:none;font:inherit;font-size:14.5px;flex:1;color:var(--ink)}
+.search input::placeholder{color:var(--faint)}
+.search svg{color:var(--faint);flex:0 0 auto}
+
+.lesson{
+  background:var(--cell);border:1px solid var(--grid);border-radius:var(--radius);
+  margin-bottom:14px;box-shadow:var(--shadow-sm);overflow:hidden;
+}
+.lesson-head{
+  display:flex;align-items:center;gap:14px;padding:18px 22px;cursor:pointer;user-select:none;
+}
+.lesson-num{
+  font-family:var(--mono);font-size:12.5px;font-weight:600;color:var(--faint);
+  width:30px;flex:0 0 30px;
+}
+.lesson-title{flex:1;min-width:0}
+.lesson-title h3{font-size:17.5px;letter-spacing:-.01em}
+.lesson-title .tag-line{font-size:13px;color:var(--muted);margin-top:2px}
+.lesson-badges{display:flex;gap:6px;flex:0 0 auto}
+.lesson-toggle{color:var(--faint);transition:transform .25s;flex:0 0 auto}
+.lesson.open .lesson-toggle{transform:rotate(180deg)}
+.lesson-body{
+  display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s ease;
+}
+.lesson.open .lesson-body{grid-template-rows:1fr}
+.lesson-body-inner{overflow:hidden}
+.lesson-content{padding:4px 22px 26px;border-top:1px solid var(--grid-2)}
+.lesson-content h4{
+  font-family:var(--display);font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--pine);margin:22px 0 10px;display:flex;align-items:center;gap:8px;
+}
+.lesson-content h4::before{content:"";width:14px;height:2px;background:var(--pine);border-radius:2px}
+.lesson-content p{color:var(--ink);margin-bottom:8px;font-size:15px}
+.steps{counter-reset:s;list-style:none;padding:0;margin:8px 0 0;display:grid;gap:9px}
+.steps li{position:relative;padding-left:36px;font-size:14.5px;color:var(--ink)}
+.steps li::before{
+  counter-increment:s;content:counter(s);position:absolute;left:0;top:0;
+  width:24px;height:24px;border-radius:7px;background:var(--pine-soft);color:var(--pine-deep);
+  font-family:var(--mono);font-size:12px;font-weight:600;display:grid;place-items:center;
+}
+.callout{
+  display:flex;gap:11px;background:var(--amber-soft);border:1px solid #f0d9a8;
+  border-radius:var(--radius-sm);padding:13px 15px;margin-top:14px;font-size:13.5px;color:#7a4e0c;
+}
+.callout svg{flex:0 0 auto;color:var(--amber);margin-top:1px}
+.callout b{color:#5f3d09}
+.uses{display:flex;flex-wrap:wrap;gap:7px;margin-top:6px}
+.uses span{font-size:12.5px;background:var(--paper);border:1px solid var(--grid);padding:3px 10px;border-radius:100px;color:var(--muted)}
+
+.empty{
+  text-align:center;padding:70px 20px;color:var(--faint);
+}
+.empty svg{margin-bottom:12px}
+
+/* ============================================================
+   SHORTCUTS
+   ============================================================ */
+.sc-cat{margin-bottom:30px}
+.sc-cat-head{display:flex;align-items:center;gap:11px;margin-bottom:12px}
+.sc-cat-head .ci{width:32px;height:32px;border-radius:9px;background:var(--pine-soft);color:var(--pine-deep);display:grid;place-items:center;flex:0 0 32px}
+.sc-cat-head h3{font-size:18px}
+.sc-cat-head span{font-family:var(--mono);font-size:12px;color:var(--faint)}
+.sc-list{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sc{
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
+  background:var(--cell);border:1px solid var(--grid);border-radius:var(--radius-sm);
+  padding:11px 15px;box-shadow:var(--shadow-sm);
+}
+.sc .desc{font-size:14px;color:var(--ink);min-width:0}
+.sc .keys{display:flex;gap:5px;align-items:center;flex:0 0 auto;flex-wrap:wrap;justify-content:flex-end}
+.sc .plus{color:var(--faint);font-size:12px}
+
+/* ============================================================
+   TIPS
+   ============================================================ */
+.tips-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.tip{
+  background:var(--cell);border:1px solid var(--grid);border-radius:var(--radius);
+  padding:22px;box-shadow:var(--shadow-sm);position:relative;
+}
+.tip-n{font-family:var(--mono);font-size:12px;color:var(--faint);font-weight:600}
+.tip h4{font-size:16.5px;margin:8px 0 8px;letter-spacing:-.01em}
+.tip p{font-size:14px;color:var(--muted);line-height:1.55}
+.tip .tag{
+  display:inline-block;margin-top:12px;font-family:var(--mono);font-size:11px;
+  color:var(--pine-deep);background:var(--pine-soft);padding:3px 9px;border-radius:6px;
+}
+
+/* ============================================================
+   FORMULA GENERATOR  (the signature)
+   ============================================================ */
+.fg-head{max-width:64ch}
+.fg-search{
+  margin:22px 0 8px;display:flex;align-items:center;gap:12px;
+  background:var(--cell);border:1px solid var(--grid);border-radius:13px;
+  padding:14px 18px;box-shadow:var(--shadow-sm);
+}
+.fg-search .fx-badge{
+  font-family:var(--mono);font-style:italic;font-weight:600;color:var(--pine);font-size:17px;
+  border-right:1px solid var(--grid);padding-right:12px;
+}
+.fg-search input{border:none;outline:none;background:none;font:inherit;font-size:15.5px;flex:1;color:var(--ink)}
+.fg-search input::placeholder{color:var(--faint)}
+.fg-suggest{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 26px}
+.fg-suggest .lbl{font-size:12.5px;color:var(--faint);align-self:center;margin-right:2px}
+.pill{
+  border:1px solid var(--grid);background:var(--cell);border-radius:100px;
+  padding:6px 13px;font-size:12.5px;color:var(--muted);cursor:pointer;transition:.15s;font-weight:500;
+}
+.pill:hover{border-color:var(--pine);color:var(--pine-deep);background:var(--pine-soft)}
+
+.fg-layout{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+.fg-panel{
+  background:var(--cell);border:1px solid var(--grid);border-radius:var(--radius);
+  box-shadow:var(--shadow-sm);overflow:hidden;
+}
+.fg-panel-head{padding:16px 20px;border-bottom:1px solid var(--grid);display:flex;align-items:center;gap:10px}
+.fg-panel-head .n{width:24px;height:24px;border-radius:7px;background:var(--pine);color:#fff;font-family:var(--mono);font-size:12px;font-weight:600;display:grid;place-items:center;flex:0 0 24px}
+.fg-panel-head h3{font-size:15px}
+.fg-panel-body{padding:20px}
+
+.field{margin-bottom:16px}
+.field:last-child{margin-bottom:0}
+.field label{display:block;font-size:13px;font-weight:600;color:var(--ink);margin-bottom:6px}
+.field .hint{font-size:12px;color:var(--faint);font-weight:400;margin-left:6px}
+.field input,.field select{
+  width:100%;padding:10px 13px;border:1px solid var(--grid);border-radius:9px;
+  font:inherit;font-size:14px;background:var(--paper);color:var(--ink);outline:none;transition:.15s;
+}
+.field input.mono{font-family:var(--mono)}
+.field input:focus,.field select:focus{border-color:var(--pine);background:var(--cell);box-shadow:0 0 0 3px var(--pine-soft)}
+.field select{cursor:pointer}
+.fg-task-select{margin-bottom:20px}
+
+/* output panel */
+.out-fxbar{padding:0}
+.out-top{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--grid);background:var(--paper)}
+.out-cell{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--muted);border:1px solid var(--grid);background:var(--cell);border-radius:6px;padding:3px 9px}
+.out-fx{font-family:var(--mono);font-style:italic;font-weight:600;color:var(--pine);font-size:16px}
+.out-formula{
+  font-family:var(--mono);font-size:14.5px;line-height:1.6;padding:20px 18px;
+  background:#0C1D16;color:#E9F3EE;white-space:pre-wrap;word-break:break-word;min-height:80px;
+}
+.out-formula .eq{color:#7BD0A6}
+.out-formula .fn{color:#8FD4FF}
+.out-formula .ph{color:#F2C879}
+.copy-btn{
+  display:inline-flex;align-items:center;gap:8px;margin:16px 18px;
+  padding:9px 16px;border-radius:9px;border:1px solid var(--pine);
+  background:var(--pine);color:#fff;font-weight:600;font-size:13.5px;cursor:pointer;transition:.15s;
+}
+.copy-btn:hover{background:var(--pine-deep)}
+.copy-btn.done{background:var(--cell);color:var(--pine-deep)}
+.explain{padding:0 20px 22px}
+.explain h4{font-family:var(--display);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--pine);margin:6px 0 8px}
+.explain p{font-size:14px;color:var(--ink);margin-bottom:6px}
+.explain .where{
+  display:flex;gap:10px;background:var(--amber-soft);border:1px solid #f0d9a8;border-radius:9px;
+  padding:12px 14px;margin-top:12px;font-size:13.5px;color:#7a4e0c;
+}
+.explain .where svg{flex:0 0 auto;color:var(--amber);margin-top:1px}
+
+.fg-note{margin-top:20px;font-size:13px;color:var(--faint);text-align:center;max-width:60ch;margin-left:auto;margin-right:auto}
+
+/* ---------- responsive ---------- */
+.backdrop{display:none}
+@media (max-width:960px){
+  .fg-layout,.tracks,.home-grid,.sc-list{grid-template-columns:1fr}
+}
+@media (max-width:860px){
+  :root{--sidebar-w:270px}
+  .sidebar{
+    position:fixed;left:0;top:0;transform:translateX(-100%);
+    transition:transform .28s cubic-bezier(.2,.7,.3,1);box-shadow:0 0 40px rgba(0,0,0,.2);
+  }
+  body.nav-open .sidebar{transform:none}
+  .topbar{display:flex}
+  .backdrop{position:fixed;inset:0;background:rgba(19,32,25,.4);z-index:39;display:none}
+  body.nav-open .backdrop{display:block}
+  .wrap{padding:26px 18px 80px}
+  .hero{padding:32px 0 8px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.001ms!important;transition-duration:.001ms!important;scroll-behavior:auto}
+  .caret{animation:none}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- ================= SIDEBAR ================= -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-mark">
+        <div class="brand-fx">fx</div>
+        <div>
+          <div class="brand-name">The Excel Workbook</div>
+          <div class="brand-sub">BBA &amp; MBA · course reference</div>
+        </div>
+      </div>
+    </div>
+    <nav class="nav" id="nav">
+      <div class="nav-label">Sheets</div>
+      <!-- tabs injected -->
+    </nav>
+    <div class="sidebar-foot">
+      A living reference from your 4-day Excel course. Bookmark it — everything you learned lives here.
+    </div>
+  </aside>
+  <div class="backdrop" id="backdrop"></div>
+
+  <!-- ================= MAIN ================= -->
+  <main class="main">
+    <div class="topbar">
+      <button class="hamburger" id="hamburger" aria-label="Open menu">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <div class="brand-name">The Excel Workbook</div>
+    </div>
+
+    <!-- ===== HOME ===== -->
+    <section class="view active" id="view-home">
+      <div class="wrap">
+        <div class="hero">
+          <span class="eyebrow">fx · your complete Excel companion</span>
+          <h1 style="margin-top:18px">Everything you learned,<br><span class="hl">in one place.</span></h1>
+          <p class="hero-lead">Step-by-step lessons, every shortcut sorted by category, real-world tips, and a generator that writes the exact formula for you — built for the BBA &amp; MBA course, kept for whenever you need it.</p>
+          <div class="hero-cta">
+            <button class="btn btn-primary" data-goto="generator">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h10M4 17h7"/><circle cx="18" cy="15" r="3"/><path d="M20.5 17.5L22 19"/></svg>
+              Generate a formula
+            </button>
+            <button class="btn btn-ghost" data-goto="course">Browse the lessons</button>
+          </div>
+
+          <!-- signature: mini formula bar demo -->
+          <div class="fxbar" aria-hidden="true">
+            <div class="fxbar-top">
+              <span class="fxbar-cell">D2</span>
+              <span class="fxbar-line"></span>
+              <span class="fxbar-fx">fx</span>
+            </div>
+            <div class="fxbar-body"><span class="type" id="demoType"></span><span class="caret"></span></div>
+          </div>
+
+          <div class="stat-row">
+            <div class="stat"><b id="statLessons">13</b><span>guided lessons</span></div>
+            <div class="stat"><b id="statShortcuts">0</b><span>keyboard shortcuts</span></div>
+            <div class="stat"><b id="statFormulas">11</b><span>formula recipes</span></div>
+            <div class="stat"><b>2</b><span>tracks: BBA &amp; MBA</span></div>
+          </div>
+        </div>
+
+        <div class="section-head" style="margin-top:52px">
+          <span class="eyebrow">Two tracks</span>
+          <h2>Pick up where your class did</h2>
+          <p>Lessons are tagged so you can filter to exactly what your course covered.</p>
+        </div>
+        <div class="tracks">
+          <div class="track">
+            <h3><span class="chip chip-bba">BBA</span> Foundations</h3>
+            <p>The core toolkit for cleaning data, looking things up, and building your first interactive dashboard.</p>
+            <ul>
+              <li>Data cleaning</li><li>VLOOKUP</li><li>HLOOKUP</li><li>XLOOKUP</li><li>INDEX/MATCH</li><li>IFERROR</li><li>PivotTables</li><li>Slicers &amp; timeline</li><li>Data analysis</li><li>AI for analysis</li>
+            </ul>
+          </div>
+          <div class="track mba">
+            <h3><span class="chip chip-mba">MBA</span> Everything + more</h3>
+            <p>All of the foundations, plus Power Query, advanced PivotTables &amp; charts, and deeper analysis.</p>
+            <ul>
+              <li>All BBA topics</li><li>Power Query</li><li>Advanced pivots</li><li>Pivot charts</li><li>Deeper analysis</li><li>AI for analysis</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="section-head" style="margin-top:52px">
+          <span class="eyebrow">Jump in</span>
+          <h2>What do you need right now?</h2>
+        </div>
+        <div class="home-grid">
+          <button class="qcard" data-goto="course">
+            <span class="qi"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16v14H4z"/><path d="M4 9h16M9 5v14"/></svg></span>
+            <span><h4>Course Guide</h4><p>Re-learn any topic with steps, examples and pitfalls.</p></span>
+          </button>
+          <button class="qcard" data-goto="shortcuts">
+            <span class="qi"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg></span>
+            <span><h4>Shortcuts</h4><p>Every key combo, sorted by category and searchable.</p></span>
+          </button>
+          <button class="qcard" data-goto="tips">
+            <span class="qi"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.1h6c0-.8.4-1.6 1-2.1A7 7 0 0 0 12 2z"/></svg></span>
+            <span><h4>Tips &amp; Tricks</h4><p>Small habits that make you noticeably faster.</p></span>
+          </button>
+          <button class="qcard" data-goto="generator">
+            <span class="qi"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h10M4 17h7"/><circle cx="18" cy="15" r="3"/><path d="M20.5 17.5L22 19"/></svg></span>
+            <span><h4>Formula Generator</h4><p>Describe your goal — get the exact formula to paste.</p></span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== COURSE ===== -->
+    <section class="view" id="view-course">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="eyebrow">Course Guide</span>
+          <h2>The lessons, step by step</h2>
+          <p>Everything taught across the four days. Filter by your track or search for a topic, then click any lesson to expand it.</p>
+        </div>
+        <div class="toolbar">
+          <div class="seg" id="trackSeg">
+            <button data-track="all" class="on">All</button>
+            <button data-track="bba">BBA</button>
+            <button data-track="mba">MBA only</button>
+          </div>
+          <label class="search">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+            <input type="text" id="courseSearch" placeholder="Search lessons — e.g. vlookup, pivot, clean…">
+          </label>
+        </div>
+        <div id="lessonList"></div>
+      </div>
+    </section>
+
+    <!-- ===== SHORTCUTS ===== -->
+    <section class="view" id="view-shortcuts">
+      <div class="wrap wrap-wide">
+        <div class="section-head">
+          <span class="eyebrow">Shortcuts</span>
+          <h2>Keyboard shortcuts, by category</h2>
+          <p>The combinations worth committing to memory. Switch to Mac keys if you're on a Mac, or search to find one fast.</p>
+        </div>
+        <div class="toolbar">
+          <div class="seg" id="osSeg">
+            <button data-os="win" class="on">Windows</button>
+            <button data-os="mac">Mac</button>
+          </div>
+          <label class="search">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+            <input type="text" id="scSearch" placeholder="Search shortcuts — e.g. filter, absolute, fill…">
+          </label>
+        </div>
+        <div id="scList"></div>
+      </div>
+    </section>
+
+    <!-- ===== TIPS ===== -->
+    <section class="view" id="view-tips">
+      <div class="wrap wrap-wide">
+        <div class="section-head">
+          <span class="eyebrow">Tips &amp; Tricks</span>
+          <h2>Work smarter, not harder</h2>
+          <p>Fifteen small habits that separate a confident Excel user from a slow one.</p>
+        </div>
+        <div class="tips-grid" id="tipsGrid"></div>
+      </div>
+    </section>
+
+    <!-- ===== GENERATOR ===== -->
+    <section class="view" id="view-generator">
+      <div class="wrap wrap-wide">
+        <div class="section-head fg-head">
+          <span class="eyebrow">fx · Formula Generator</span>
+          <h2>Tell it your goal. Get the exact formula.</h2>
+          <p>Describe what you want to do, fill in a few details about your data, and it writes the formula — with a plain-English explanation and where to type it.</p>
+        </div>
+
+        <div class="fg-search">
+          <span class="fx-badge">fx</span>
+          <input type="text" id="fgSearch" placeholder="What do you want to do? e.g. “find a price from an ID”, “count how many are Nepal”…">
+        </div>
+        <div class="fg-suggest" id="fgSuggest"><span class="lbl">Try:</span></div>
+
+        <div class="fg-layout">
+          <div class="fg-panel">
+            <div class="fg-panel-head"><span class="n">1</span><h3>Build your formula</h3></div>
+            <div class="fg-panel-body">
+              <div class="field fg-task-select">
+                <label>What do you want to do?</label>
+                <select id="fgTask"></select>
+              </div>
+              <div id="fgFields"></div>
+            </div>
+          </div>
+
+          <div class="fg-panel">
+            <div class="fg-panel-head"><span class="n">2</span><h3>Your formula</h3></div>
+            <div class="out-fxbar">
+              <div class="out-top">
+                <span class="out-cell" id="fgCell">D2</span>
+                <span class="fxbar-line"></span>
+                <span class="out-fx">fx</span>
+              </div>
+              <div class="out-formula" id="fgOut"></div>
+              <button class="copy-btn" id="fgCopy">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+                Copy formula
+              </button>
+              <div class="explain">
+                <h4>How it works</h4>
+                <div id="fgExplain"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="fg-note">Adjust the cell references to match your own sheet. Column letters (A, B, C…) and row numbers are just examples — swap in yours.</p>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+/* ============================================================
+   DATA
+   ============================================================ */
+
+/* ---- Sheet tabs ---- */
+const TABS=[
+  {id:"home",label:"Home",icon:'<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/>'},
+  {id:"course",label:"Course Guide",icon:'<path d="M4 5h16v14H4z"/><path d="M4 9h16M9 5v14"/>'},
+  {id:"shortcuts",label:"Shortcuts",icon:'<rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/>'},
+  {id:"tips",label:"Tips & Tricks",icon:'<path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.1h6c0-.8.4-1.6 1-2.1A7 7 0 0 0 12 2z"/>'},
+  {id:"generator",label:"Formula Generator",icon:'<path d="M4 7h16M4 12h10M4 17h7"/><circle cx="18" cy="15" r="3"/><path d="M20.5 17.5L22 19"/>'},
+];
+
+/* ---- Course lessons ---- */
+/* track: 'bba' shows for BBA & (all/MBA since MBA includes BBA). 'mba' shows only for MBA. */
+const LESSONS=[
+ {track:"bba",title:"Data Cleaning",tag:"Turn messy, inconsistent data into something you can actually analyse.",
+  what:"Real data arrives with extra spaces, mixed capitalisation, duplicates and text where numbers should be. Cleaning fixes all of that first — every good analysis starts here.",
+  uses:["Trailing spaces","Inconsistent case","Duplicates","Split full names","Text-as-numbers"],
+  steps:[
+    "<b>Remove duplicates:</b> select your range → <i>Data ▸ Remove Duplicates</i> → tick the columns that define a duplicate.",
+    "<b>Trim spaces:</b> use <code class='inl'>=TRIM(A2)</code> to strip extra spaces; <code class='inl'>=CLEAN(A2)</code> removes odd non-printing characters.",
+    "<b>Fix case:</b> <code class='inl'>=PROPER(A2)</code> for Title Case, <code class='inl'>=UPPER()</code> or <code class='inl'>=LOWER()</code> as needed.",
+    "<b>Split one column into many:</b> <i>Data ▸ Text to Columns</i> (by comma, space, etc.), or type an example and press <kbd>Ctrl</kbd>+<kbd>E</kbd> (Flash Fill).",
+    "<b>Find &amp; Replace:</b> <kbd>Ctrl</kbd>+<kbd>H</kbd> to standardise values (e.g. “NP” → “Nepal”) across the sheet.",
+    "<b>Fix text-numbers:</b> select the range → click the warning icon → <i>Convert to Number</i>, or multiply by 1."
+  ],
+  formula:"=TRIM(PROPER(A2))",
+  formulaCaption:"Clean spacing and fix capitalisation in one step.",
+  watch:"Cleaning with formulas creates a <b>new</b> column. Once it looks right, copy it and <b>Paste Special ▸ Values</b> over the original so the result stays fixed."
+ },
+ {track:"bba",title:"VLOOKUP",tag:"Look up a value in a table and pull back a matching detail.",
+  what:"VLOOKUP searches for a value down the <b>leftmost</b> column of a table and returns something from a column to its right — like finding a price from a product ID.",
+  uses:["Price from ID","Name from code","Match two lists"],
+  steps:[
+    "Start with <code class='inl'>=VLOOKUP(</code> and pick the value you're searching for (e.g. the ID in <code class='inl'>A2</code>).",
+    "Select the whole table to search — the lookup column must be the <b>first</b> column of that range.",
+    "Type the <b>column number</b> to return (counting from the left of your table, starting at 1).",
+    "End with <code class='inl'>FALSE</code> for an <b>exact</b> match. Almost always use FALSE.",
+    "Lock the table with <kbd>F4</kbd> (<code class='inl'>$A$2:$D$100</code>) before dragging the formula down."
+  ],
+  formula:"=VLOOKUP(A2, $F$2:$H$100, 3, FALSE)",
+  formulaCaption:"Find A2 in the first column of F:H, return the 3rd column, exact match.",
+  watch:"VLOOKUP can only look to the <b>right</b>. If what you want to return sits to the left of the lookup column, use <b>XLOOKUP</b> or <b>INDEX/MATCH</b> instead."
+ },
+ {track:"bba",title:"HLOOKUP",tag:"Same idea as VLOOKUP, but searching across a row.",
+  what:"HLOOKUP looks along the <b>top row</b> of a table and returns a value from a row below it. Useful when your data is laid out horizontally (e.g. months across the top).",
+  uses:["Data laid out in rows","Month across the top","Header-based lookup"],
+  steps:[
+    "Begin with <code class='inl'>=HLOOKUP(</code> and choose the value to find (it must sit in the top row of your table).",
+    "Select the table range that includes the header row and the data below it.",
+    "Give the <b>row number</b> to return, counting down from the top row (starting at 1).",
+    "Add <code class='inl'>FALSE</code> for an exact match."
+  ],
+  formula:"=HLOOKUP(B1, $B$1:$M$5, 4, FALSE)",
+  formulaCaption:"Find B1 across the top row, return the value from the 4th row down.",
+  watch:"HLOOKUP is uncommon in practice because data is usually vertical. If you're on Excel 365, <b>XLOOKUP</b> handles both directions and is easier to read."
+ },
+ {track:"bba",title:"XLOOKUP",tag:"The modern lookup — looks any direction, no column counting.",
+  what:"XLOOKUP replaces both VLOOKUP and HLOOKUP. You point it at a <b>lookup column</b> and a <b>return column</b> directly, so it can look left or right and never breaks when columns move.",
+  uses:["Look left or right","Built-in “not found” text","No fragile column numbers"],
+  steps:[
+    "Type <code class='inl'>=XLOOKUP(</code> then the value you're searching for.",
+    "Select the <b>lookup array</b> — the single column that contains that value.",
+    "Select the <b>return array</b> — the single column with the answer you want back.",
+    "Optionally add text for when nothing is found, e.g. <code class='inl'>\"Not found\"</code>.",
+    "Lock the arrays with <kbd>F4</kbd> before copying down."
+  ],
+  formula:"=XLOOKUP(A2, $F$2:$F$100, $H$2:$H$100, \"Not found\")",
+  formulaCaption:"Find A2 in column F and return the matching value from column H.",
+  watch:"XLOOKUP needs Excel 2021 or Microsoft 365. On older versions use INDEX/MATCH, which works the same way and everywhere."
+ },
+ {track:"bba",title:"INDEX &amp; MATCH",tag:"The flexible lookup that works on every version of Excel.",
+  what:"INDEX returns the value at a position in a range; MATCH finds that position. Together they look up in any direction and don't care where columns sit — the reliable classic before XLOOKUP.",
+  uses:["Left-side lookups","Two-way lookups","Older Excel versions"],
+  steps:[
+    "<b>MATCH</b> finds the row: <code class='inl'>MATCH(A2, $F$2:$F$100, 0)</code> — the <code class='inl'>0</code> means exact match.",
+    "<b>INDEX</b> returns from that row: <code class='inl'>INDEX($H$2:$H$100, ...)</code>.",
+    "Nest them: put the MATCH inside INDEX as the row number.",
+    "Read it as “return from column H, the row where column F equals A2.”"
+  ],
+  formula:"=INDEX($H$2:$H$100, MATCH(A2, $F$2:$F$100, 0))",
+  formulaCaption:"Return the value in H from the row where F matches A2.",
+  watch:"This is the go-to when the answer is to the <b>left</b> of your lookup value, or when you want a lookup that survives inserted/moved columns."
+ },
+ {track:"bba",title:"MATCH inside VLOOKUP",tag:"Make VLOOKUP's column number update itself.",
+  what:"The weak point of VLOOKUP is the hard-typed column number — it breaks if columns shift. Replacing it with MATCH makes VLOOKUP find the right column by its <b>header name</b> automatically.",
+  uses:["Dynamic column pick","Header-driven reports","Copy across many columns"],
+  steps:[
+    "Write a normal VLOOKUP but leave the column-number spot for MATCH.",
+    "Use MATCH to find the header: <code class='inl'>MATCH(\"Price\", $F$1:$H$1, 0)</code> returns which column “Price” is.",
+    "Drop that MATCH where the column number goes.",
+    "Now the same formula pulls the correct column even if headers are rearranged."
+  ],
+  formula:"=VLOOKUP(A2, $F$2:$H$100, MATCH(\"Price\", $F$1:$H$1, 0), FALSE)",
+  formulaCaption:"VLOOKUP that finds the “Price” column by name, not by counting.",
+  watch:"The MATCH range for the header must line up with your table's columns. Great for report templates where you pull several fields with one pattern."
+ },
+ {track:"bba",title:"Exact vs Approximate Match (TRUE / FALSE)",tag:"What that last argument really does.",
+  what:"The final argument of VLOOKUP/HLOOKUP controls matching. <code class='inl'>FALSE</code> (or 0) demands an <b>exact</b> match — what you want 95% of the time. <code class='inl'>TRUE</code> (or 1) does an <b>approximate</b> match: it finds the largest value that isn't over your lookup.",
+  uses:["Tax brackets","Grade bands","Commission tiers"],
+  steps:[
+    "Use <code class='inl'>FALSE</code> for IDs, names, codes — anything that must match precisely.",
+    "Use <code class='inl'>TRUE</code> for <b>banded</b> lookups, e.g. turning a score into a grade.",
+    "For TRUE to work, the lookup column must be sorted <b>ascending</b> (smallest to largest).",
+    "Build a small band table: lower bound in the left column, result in the next."
+  ],
+  formula:"=VLOOKUP(B2, $E$2:$F$6, 2, TRUE)",
+  formulaCaption:"Approximate match: turns a score in B2 into its grade band.",
+  watch:"Forgetting FALSE is the #1 lookup bug — Excel defaults to approximate and can return the wrong answer silently. When in doubt, type FALSE."
+ },
+ {track:"bba",title:"IFERROR",tag:"Replace ugly #N/A and #DIV/0! with something friendly.",
+  what:"When a lookup finds nothing it returns <code class='inl'>#N/A</code>; a bad division returns <code class='inl'>#DIV/0!</code>. IFERROR catches any error and shows your message instead — cleaner reports, no scary red text.",
+  uses:["Hide #N/A in lookups","Blank instead of error","Cleaner dashboards"],
+  steps:[
+    "Wrap your existing formula: <code class='inl'>=IFERROR( yourFormula , \"\" )</code>.",
+    "The second part is what shows <b>if</b> there's an error — <code class='inl'>\"\"</code> for blank, or text like <code class='inl'>\"Not found\"</code>.",
+    "Type your working formula first, get it right, then add the IFERROR around it."
+  ],
+  formula:"=IFERROR(VLOOKUP(A2, $F$2:$H$100, 3, FALSE), \"Not found\")",
+  formulaCaption:"Run the VLOOKUP, but show “Not found” instead of #N/A.",
+  watch:"IFERROR hides <b>all</b> errors, including real mistakes in your formula. Confirm the formula works correctly before wrapping it, so you don't mask a genuine problem."
+ },
+ {track:"bba",title:"PivotTables (Basics)",tag:"Summarise thousands of rows into an answer in seconds — no formulas.",
+  what:"A PivotTable groups and totals your data by dragging fields into four zones. It's the fastest way to answer “how much, by what?” — sales by region, count by category, average by month.",
+  uses:["Totals by category","Count by group","Averages by month"],
+  steps:[
+    "Click anywhere in your data → <i>Insert ▸ PivotTable</i> → confirm the range → place it on a new sheet.",
+    "Drag a field into <b>Rows</b> to group (e.g. Region).",
+    "Drag a number into <b>Values</b> to summarise (Sum by default).",
+    "Change the summary: click the field in Values → <i>Value Field Settings</i> → Sum / Count / Average.",
+    "Use <b>Columns</b> to break totals down two ways, and <b>Filters</b> to focus on a subset.",
+    "Data changed? Right-click the pivot → <b>Refresh</b>."
+  ],
+  formula:"Rows: Region  ·  Values: Sum of Sales",
+  formulaCaption:"A one-line recipe for total sales by region.",
+  watch:"Format your source as a <b>Table</b> first (<kbd>Ctrl</kbd>+<kbd>T</kbd>). New rows then flow into the pivot automatically on refresh — no re-selecting the range."
+ },
+ {track:"bba",title:"Interactive Dashboards — Slicers &amp; Timeline",tag:"Turn PivotTables into a clickable, filterable dashboard.",
+  what:"Slicers are big clickable filter buttons; a Timeline filters by date with a slider. Connect them to your PivotTables and charts, and one click updates the whole dashboard live.",
+  uses:["Click-to-filter reports","Date range sliders","Live management dashboards"],
+  steps:[
+    "Click your PivotTable → <i>Insert ▸ Slicer</i> → tick the field(s) to filter by (e.g. Region, Category).",
+    "For dates, use <i>Insert ▸ Timeline</i> and pick a date field.",
+    "Add a <b>PivotChart</b> (<i>Insert ▸ PivotChart</i>) so the visual reacts too.",
+    "Wire one slicer to several pivots: right-click the slicer → <i>Report Connections</i> → tick each PivotTable.",
+    "Arrange pivots, charts and slicers on one sheet; hide gridlines for a clean dashboard look."
+  ],
+  formula:"Slicer(Region) + Timeline(Order Date) → all pivots update",
+  formulaCaption:"One click filters every connected pivot and chart.",
+  watch:"Slicers only control pivots they're <b>connected</b> to. If a chart isn't reacting, open <i>Report Connections</i> and make sure its pivot is ticked."
+ },
+ {track:"bba",title:"Basic Data Analysis",tag:"Sort, filter, highlight and summarise to find the story.",
+  what:"Before any fancy tool, most insight comes from sorting, filtering, conditional formatting and a handful of summary functions. This is the everyday analysis toolkit.",
+  uses:["Rank top performers","Filter to a segment","Spot outliers","Quick totals"],
+  steps:[
+    "Turn on filters with <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>L</kbd>, then sort or filter any column from its dropdown.",
+    "Highlight patterns with <i>Home ▸ Conditional Formatting</i> (colour scales, top 10, data bars).",
+    "Summarise with <code class='inl'>SUM</code>, <code class='inl'>AVERAGE</code>, <code class='inl'>COUNT</code>, <code class='inl'>MAX</code>, <code class='inl'>MIN</code>.",
+    "Answer “how many that meet a condition?” with <code class='inl'>COUNTIF</code>; “total for a group?” with <code class='inl'>SUMIF</code>.",
+    "Select a range and read instant Sum/Average/Count on the <b>status bar</b> at the bottom."
+  ],
+  formula:"=SUMIFS(C2:C100, A2:A100, \"Nepal\", B2:B100, \">1000\")",
+  formulaCaption:"Total column C where country is Nepal AND value is over 1000.",
+  watch:"For multiple conditions use the <b>-IFS</b> versions (SUMIFS, COUNTIFS, AVERAGEIFS). Note SUMIFS puts the sum range <b>first</b>, while SUMIF puts it last."
+ },
+ {track:"mba",title:"Power Query — Clean Data on Autopilot",tag:"Record your cleaning steps once; refresh forever.",
+  what:"Power Query (<i>Data ▸ Get &amp; Transform</i>) imports data and records every clean-up step. Next time the source updates, one <b>Refresh</b> re-runs all steps — no repeating the work.",
+  uses:["Repeatable monthly cleanup","Combine many files","Merge two tables","Unpivot messy sheets"],
+  steps:[
+    "Get data: <i>Data ▸ Get Data</i> (from a file, folder, or an existing range via <i>From Table/Range</i>).",
+    "In the Power Query Editor, clean visually: remove columns, split, trim, change types, filter rows.",
+    "Every action becomes a step in <b>Applied Steps</b> on the right — editable and reorderable.",
+    "<b>Merge</b> to join two tables (like VLOOKUP for whole tables); <b>Append</b> to stack tables on top of each other.",
+    "Click <i>Close &amp; Load</i> to send the clean table back to Excel.",
+    "When source data changes, hit <b>Refresh All</b> and every step re-runs automatically."
+  ],
+  formula:"Source → Removed Columns → Trimmed Text → Changed Type → Loaded",
+  formulaCaption:"A recorded query — refresh to re-run the whole clean-up.",
+  watch:"Power Query never edits your original data — it builds a clean copy. Ideal for reports you rebuild every week or month from the same messy export."
+ },
+ {track:"mba",title:"Advanced PivotTables &amp; Charts",tag:"Percentages, running totals, grouping and combo charts.",
+  what:"Beyond basic totals, PivotTables can show each value as a % of the whole, running totals, and differences — and pivot charts turn them into visuals that filter live.",
+  uses:["% of total","Running totals","Group dates by month/quarter","Combo charts"],
+  steps:[
+    "Show a % instead of a raw number: right-click a Value → <i>Show Values As</i> → <i>% of Grand Total</i>, <i>Running Total</i>, etc.",
+    "Add your own metric with a <b>Calculated Field</b> (<i>PivotTable Analyze ▸ Fields, Items &amp; Sets</i>), e.g. Profit = Sales − Cost.",
+    "<b>Group dates:</b> right-click a date in Rows → <i>Group</i> → by Months / Quarters / Years.",
+    "Insert a <b>PivotChart</b> and change its type; use a <b>combo chart</b> to put, say, revenue as bars and margin % as a line.",
+    "Add slicers/timeline so charts and pivots filter together as a dashboard."
+  ],
+  formula:"Show Values As ▸ % of Grand Total   ·   Group ▸ by Month",
+  formulaCaption:"Two settings that turn a plain pivot into an analytical one.",
+  watch:"Calculated fields operate on <b>totals</b>, not row-by-row — fine for sums and simple maths, but check the result if you're doing ratios of averages."
+ },
+ {track:"mba",title:"Data Analysis (Deeper)",tag:"What-if tools, trends and the Analysis ToolPak.",
+  what:"For heavier questions, Excel offers what-if analysis, trend/forecasting, and a statistics add-in. Enough to run scenarios, test sensitivity, and produce basic statistical output.",
+  uses:["Goal Seek","Scenarios","Forecasting","Correlation &amp; regression"],
+  steps:[
+    "<b>Goal Seek</b> (<i>Data ▸ What-If Analysis</i>): find the input that hits a target output (e.g. what price gives $50k profit).",
+    "<b>Scenario Manager</b>: save best/worst/expected input sets and switch between them.",
+    "<b>Data Table</b>: see how one output changes across many input values in a grid.",
+    "<b>Forecast:</b> select a time series → <i>Data ▸ Forecast Sheet</i> for a trendline projection.",
+    "Turn on the <b>Analysis ToolPak</b> (<i>File ▸ Options ▸ Add-ins</i>) for descriptive statistics, correlation and regression."
+  ],
+  formula:"=FORECAST.LINEAR(nextX, knownYs, knownXs)",
+  formulaCaption:"Project the next value along a linear trend.",
+  watch:"These tools describe patterns in <b>your</b> data — they don't prove causation. Sanity-check every projection against what you know about the business."
+ },
+ {track:"bba",title:"Using AI for Data Analysis",tag:"Let AI clean, explain and analyse — with the right prompts.",
+  what:"AI assistants (Copilot in Excel, or ChatGPT/Claude alongside it) can suggest cleaning steps, write and explain formulas, summarise a dataset, and draft charts. They speed you up — but you stay the analyst who checks the result.",
+  uses:["Explain a formula","Suggest cleaning steps","Summarise a dataset","Draft the right chart"],
+  steps:[
+    "<b>Describe your data first:</b> tell the AI your column names and what each holds before asking.",
+    "<b>Ask for the formula, not just the answer:</b> “Give me an Excel formula to…” so you can reuse it.",
+    "<b>Paste errors in:</b> share the exact error text and your formula to get a fix and the reason.",
+    "<b>Summarise:</b> paste a sample (or use Copilot on the sheet) and ask for key trends, outliers and next questions.",
+    "<b>Always verify:</b> spot-check AI output on a few rows you can confirm by hand before trusting it."
+  ],
+  formula:"“Write an Excel formula to sum Sales where Region = North and Month = Jan.”",
+  formulaCaption:"A clear, specific prompt gets a correct, reusable formula.",
+  watch:"AI can confidently give a <b>wrong</b> formula or misread your data. Treat it as a fast draft, and validate against a small sample you already understand."
+ }
+];
+
+/* ---- Shortcuts (win / mac keys) ---- */
+const SC=[
+ {cat:"Navigation",icon:'<path d="M5 12h14M12 5l7 7-7 7"/>',items:[
+   {d:"Move to the edge of data",win:["Ctrl","Arrow"],mac:["⌘","Arrow"]},
+   {d:"Go to cell A1",win:["Ctrl","Home"],mac:["⌘","Home"]},
+   {d:"Go to last used cell",win:["Ctrl","End"],mac:["⌘","End"]},
+   {d:"Next / previous worksheet",win:["Ctrl","PgDn"],mac:["⌥","→"]},
+   {d:"Go to a specific cell",win:["Ctrl","G"],mac:["Ctrl","G"]},
+   {d:"Move one screen down",win:["PgDn"],mac:["PgDn"]},
+ ]},
+ {cat:"Selecting",icon:'<rect x="3" y="3" width="18" height="18" rx="2" stroke-dasharray="3 3"/>',items:[
+   {d:"Select to edge of data",win:["Ctrl","Shift","Arrow"],mac:["⌘","⇧","Arrow"]},
+   {d:"Select the whole column",win:["Ctrl","Space"],mac:["Ctrl","Space"]},
+   {d:"Select the whole row",win:["Shift","Space"],mac:["⇧","Space"]},
+   {d:"Select entire table / sheet",win:["Ctrl","A"],mac:["⌘","A"]},
+   {d:"Extend selection one cell",win:["Shift","Arrow"],mac:["⇧","Arrow"]},
+   {d:"Select visible cells only",win:["Alt",";"],mac:["⌘","⇧","Z"]},
+ ]},
+ {cat:"Editing &amp; Filling",icon:'<path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',items:[
+   {d:"Edit the active cell",win:["F2"],mac:["Ctrl","U"]},
+   {d:"Copy / Paste / Cut",win:["Ctrl","C / V / X"],mac:["⌘","C / V / X"]},
+   {d:"Undo / Redo",win:["Ctrl","Z / Y"],mac:["⌘","Z / Y"]},
+   {d:"Fill down from cell above",win:["Ctrl","D"],mac:["⌘","D"]},
+   {d:"Fill right from cell left",win:["Ctrl","R"],mac:["⌘","R"]},
+   {d:"Fill whole selection at once",win:["Ctrl","Enter"],mac:["Ctrl","Return"]},
+   {d:"Flash Fill (auto-pattern)",win:["Ctrl","E"],mac:["Ctrl","E"]},
+   {d:"New line inside a cell",win:["Alt","Enter"],mac:["⌥","Return"]},
+ ]},
+ {cat:"Formatting",icon:'<path d="M4 7V4h16v3M9 20h6M12 4v16"/>',items:[
+   {d:"Open Format Cells dialog",win:["Ctrl","1"],mac:["⌘","1"]},
+   {d:"Bold / Italic / Underline",win:["Ctrl","B / I / U"],mac:["⌘","B / I / U"]},
+   {d:"Currency format",win:["Ctrl","Shift","$"],mac:["⌘","⇧","$"]},
+   {d:"Percentage format",win:["Ctrl","Shift","%"],mac:["⌘","⇧","%"]},
+   {d:"Number format (2 decimals)",win:["Ctrl","Shift","!"],mac:["⌘","⇧","!"]},
+   {d:"Apply / remove borders",win:["Ctrl","Shift","&"],mac:["⌘","⌥","0"]},
+ ]},
+ {cat:"Formulas",icon:'<path d="M4 4h10l-3 8 3 8H4M8 12h6"/>',items:[
+   {d:"Toggle absolute references ($)",win:["F4"],mac:["⌘","T"]},
+   {d:"AutoSum",win:["Alt","="],mac:["⌘","⇧","T"]},
+   {d:"Show all formulas",win:["Ctrl","`"],mac:["Ctrl","`"]},
+   {d:"Calculate part of a formula",win:["F9"],mac:["F9"]},
+   {d:"Insert function dialog",win:["Shift","F3"],mac:["⇧","F3"]},
+   {d:"Enter as array (older Excel)",win:["Ctrl","Shift","Enter"],mac:["⌘","⇧","Return"]},
+ ]},
+ {cat:"Rows, Columns &amp; Data",icon:'<path d="M3 3h18v18H3zM3 9h18M9 3v18"/>',items:[
+   {d:"Turn filters on / off",win:["Ctrl","Shift","L"],mac:["⌘","⇧","F"]},
+   {d:"Insert cells / rows / columns",win:["Ctrl","Shift","+"],mac:["⌘","⇧","+"]},
+   {d:"Delete cells / rows / columns",win:["Ctrl","-"],mac:["⌘","-"]},
+   {d:"Format range as a Table",win:["Ctrl","T"],mac:["Ctrl","T"]},
+   {d:"Group rows / columns",win:["Alt","Shift","→"],mac:["⌘","⇧","K"]},
+   {d:"Hide column / row",win:["Ctrl","0 / 9"],mac:["⌘","0 / 9"]},
+ ]},
+ {cat:"Entering Data &amp; Workbook",icon:'<path d="M4 4h16v16H4zM8 4v16"/>',items:[
+   {d:"Insert today's date",win:["Ctrl",";"],mac:["Ctrl",";"]},
+   {d:"Insert current time",win:["Ctrl","Shift",";"],mac:["⌘","⇧",";"]},
+   {d:"Save",win:["Ctrl","S"],mac:["⌘","S"]},
+   {d:"New workbook",win:["Ctrl","N"],mac:["⌘","N"]},
+   {d:"Print",win:["Ctrl","P"],mac:["⌘","P"]},
+   {d:"Repeat last action",win:["F4"],mac:["⌘","Y"]},
+ ]},
+];
+
+/* ---- Tips ---- */
+const TIPS=[
+ {t:"Press F4 to lock a reference",b:"While editing a formula, tap F4 on a cell reference to cycle $A$1 → A$1 → $A1 → A1. This is how you make a reference “stay put” before dragging a formula down.",tag:"absolute refs"},
+ {t:"Turn ranges into Tables",b:"Ctrl+T converts a range into a Table that auto-expands, keeps headers visible, and lets you write readable formulas like =SUM(Sales[Amount]) instead of =SUM(C2:C500).",tag:"Ctrl+T"},
+ {t:"Flash Fill reads your mind",b:"Type one or two examples of the result you want in the next column, then press Ctrl+E. Excel spots the pattern and fills the rest — perfect for splitting names or reformatting text.",tag:"Ctrl+E"},
+ {t:"Double-click to autofill down",b:"Instead of dragging the fill handle to the bottom, double-click the tiny square at a cell's corner. Excel fills down as far as the neighbouring column has data.",tag:"fill handle"},
+ {t:"Read stats on the status bar",b:"Select any range of numbers and glance at the bottom-right of the window — Sum, Average and Count appear instantly, no formula needed. Right-click it to add Min/Max.",tag:"status bar"},
+ {t:"Paste Special ▸ Values",b:"After cleaning with formulas, copy the result and paste it back as Values (Ctrl+Alt+V ▸ V). This freezes the numbers so they don't break when you delete the helper columns.",tag:"paste values"},
+ {t:"Freeze the header row",b:"View ▸ Freeze Panes ▸ Freeze Top Row keeps your headers visible as you scroll through thousands of rows — so you always know which column is which.",tag:"freeze panes"},
+ {t:"Wrap risky formulas in IFERROR",b:"Any lookup can fail. =IFERROR(yourFormula,\"\") shows a blank (or your own message) instead of a red #N/A, keeping reports clean and presentable.",tag:"IFERROR"},
+ {t:"Build dropdowns with Data Validation",b:"Data ▸ Data Validation ▸ List lets people pick from set options instead of typing free text — the simplest way to keep data consistent from the start.",tag:"validation"},
+ {t:"Name your ranges",b:"Select a range, type a name in the Name Box (top-left), and use it in formulas: =SUM(Revenue) reads far better than =SUM(C2:C99) and never points at the wrong cells.",tag:"named ranges"},
+ {t:"Ctrl+Enter fills a whole selection",b:"Select many cells, type one formula or value, then press Ctrl+Enter — it drops into every selected cell at once, adjusting references as it goes.",tag:"Ctrl+Enter"},
+ {t:"Prefer -IFS over -IF",b:"COUNTIFS, SUMIFS and AVERAGEIFS handle several conditions at once and are easier to extend. Reach for the plural versions by default, even for a single condition.",tag:"SUMIFS"},
+ {t:"Alt keys reveal every ribbon command",b:"Press Alt once and Excel overlays letters on the ribbon. Type the letters to trigger any command without a mouse — great for actions with no built-in shortcut.",tag:"Alt keys"},
+ {t:"Format source data as a Table before pivoting",b:"If your PivotTable's source is a Table, new rows are picked up automatically on Refresh. No Table means re-selecting the range every time data grows.",tag:"pivots"},
+ {t:"Ctrl+Shift+L for instant filters",b:"Toggle filter dropdowns on your headers in one keystroke, then sort, filter, or search any column. Press again to turn them off.",tag:"Ctrl+Shift+L"},
+];
+
+/* ============================================================
+   FORMULA GENERATOR RECIPES
+   Each: label, group, keywords, fields[], build(v) -> {formula, explain}
+   Fields: {k, label, hint, type:'text'|'select'|'bool', def, opts[]}
+   ============================================================ */
+const q='"'; // helper for quotes in output
+function R(range){return range;} 
+const RECIPES=[
+ {
+  id:"vlookup", label:"Look up a value (VLOOKUP)", group:"Lookups",
+  keywords:["vlookup","look up","lookup","find","price","match","pull","id","retrieve"],
+  fields:[
+    {k:"val",label:"Cell holding the value to find",hint:"the thing you're searching for",type:"text",def:"A2",mono:true},
+    {k:"tbl",label:"Table to search (lookup column first)",hint:"whole range",type:"text",def:"$F$2:$H$100",mono:true},
+    {k:"col",label:"Which column number to return",hint:"counting from the left, start at 1",type:"text",def:"3",mono:true},
+    {k:"exact",label:"Match type",type:"select",def:"FALSE",opts:[["FALSE","Exact match (recommended)"],["TRUE","Approximate / banded"]]},
+    {k:"err",label:"Show this if not found (optional)",hint:"leave blank to allow #N/A",type:"text",def:"",mono:false},
+  ],
+  build(v){
+    let core=`VLOOKUP(${v.val}, ${v.tbl}, ${v.col}, ${v.exact})`;
+    let f = v.err.trim()!=="" ? `=IFERROR(${core}, "${v.err}")` : `=${core}`;
+    let ex=`Searches for <b>${v.val}</b> down the first column of <b>${v.tbl}</b> and returns the value from column number <b>${v.col}</b>. `+
+           (v.exact==="FALSE"?`<code class="inl">FALSE</code> forces an exact match.`:`<code class="inl">TRUE</code> does an approximate (banded) match — the lookup column must be sorted ascending.`);
+    if(v.err.trim()!=="") ex+=` Wrapped in IFERROR so it shows “${v.err}” instead of #N/A.`;
+    return {formula:f, explain:ex, where:"Type it in the cell where you want the answer, then drag down. Lock the table with F4 ($ signs) so it doesn't shift."};
+  }
+ },
+ {
+  id:"xlookup", label:"Look up a value (XLOOKUP — modern)", group:"Lookups",
+  keywords:["xlookup","look up","lookup","find","left","modern","return","365"],
+  fields:[
+    {k:"val",label:"Cell holding the value to find",type:"text",def:"A2",mono:true},
+    {k:"look",label:"Column to search in",hint:"single column",type:"text",def:"$F$2:$F$100",mono:true},
+    {k:"ret",label:"Column to return from",hint:"single column",type:"text",def:"$H$2:$H$100",mono:true},
+    {k:"err",label:"Show this if not found (optional)",type:"text",def:"Not found",mono:false},
+  ],
+  build(v){
+    let f = v.err.trim()!=="" ? `=XLOOKUP(${v.val}, ${v.look}, ${v.ret}, "${v.err}")` : `=XLOOKUP(${v.val}, ${v.look}, ${v.ret})`;
+    let ex=`Finds <b>${v.val}</b> inside <b>${v.look}</b> and returns the matching value from <b>${v.ret}</b>. XLOOKUP can look left or right and doesn't use column numbers, so it won't break if columns move.`;
+    if(v.err.trim()!=="") ex+=` If there's no match it shows “${v.err}”.`;
+    return {formula:f, explain:ex, where:"Needs Excel 2021 or Microsoft 365. On older versions, use the INDEX/MATCH option instead."};
+  }
+ },
+ {
+  id:"indexmatch", label:"Look up a value (INDEX/MATCH — any version)", group:"Lookups",
+  keywords:["index","match","index match","left lookup","older excel","flexible lookup"],
+  fields:[
+    {k:"val",label:"Cell holding the value to find",type:"text",def:"A2",mono:true},
+    {k:"look",label:"Column that contains that value",type:"text",def:"$F$2:$F$100",mono:true},
+    {k:"ret",label:"Column to return the answer from",type:"text",def:"$H$2:$H$100",mono:true},
+  ],
+  build(v){
+    let f=`=INDEX(${v.ret}, MATCH(${v.val}, ${v.look}, 0))`;
+    let ex=`MATCH finds which row <b>${v.val}</b> sits in within <b>${v.look}</b>; INDEX then returns the value on that row from <b>${v.ret}</b>. The <code class="inl">0</code> means exact match. Works on every Excel version and can return columns to the left of the lookup.`;
+    return {formula:f, explain:ex, where:"Great replacement for VLOOKUP when the answer is to the left, or when columns might move."};
+  }
+ },
+ {
+  id:"sumifs", label:"Add up with conditions (SUMIFS)", group:"Add / Count / Average",
+  keywords:["sum","total","add","sumif","sumifs","how much","revenue where"],
+  fields:[
+    {k:"sum",label:"Column of numbers to add up",type:"text",def:"C2:C100",mono:true},
+    {k:"r1",label:"Column to test (condition 1)",type:"text",def:"A2:A100",mono:true},
+    {k:"c1",label:"Condition 1",hint:'e.g. Nepal   or   >1000',type:"text",def:"Nepal",mono:false},
+    {k:"r2",label:"Column to test (condition 2 — optional)",type:"text",def:"",mono:true},
+    {k:"c2",label:"Condition 2 (optional)",type:"text",def:"",mono:false},
+  ],
+  build(v){
+    const c=cond=>{cond=cond.trim(); return /^[<>=]|^\d|^"/.test(cond)&&!/[a-zA-Z]/.test(cond.replace(/^[<>=]+/,''))?`"${cond}"`:`"${cond}"`;};
+    let parts=[v.sum, v.r1, c(v.c1)];
+    if(v.r2.trim()&&v.c2.trim()){parts.push(v.r2, c(v.c2));}
+    let f=`=SUMIFS(${parts.join(", ")})`;
+    let ex=`Adds up <b>${v.sum}</b>, but only the rows where <b>${v.r1}</b> equals “${v.c1}”`+
+           (v.r2.trim()&&v.c2.trim()?` <b>and</b> <b>${v.r2}</b> matches “${v.c2}”.`:`.`)+
+           ` SUMIFS puts the sum range <b>first</b>, then pairs of (range, condition).`;
+    return {formula:f, explain:ex, where:"For a single condition SUMIFS still works. Conditions can use operators like >, <, >= inside the text, e.g. \">1000\"."};
+  }
+ },
+ {
+  id:"countifs", label:"Count with conditions (COUNTIFS)", group:"Add / Count / Average",
+  keywords:["count","how many","countif","countifs","number of"],
+  fields:[
+    {k:"r1",label:"Column to test (condition 1)",type:"text",def:"A2:A100",mono:true},
+    {k:"c1",label:"Condition 1",hint:'e.g. Nepal   or   >1000',type:"text",def:"Nepal",mono:false},
+    {k:"r2",label:"Column to test (condition 2 — optional)",type:"text",def:"",mono:true},
+    {k:"c2",label:"Condition 2 (optional)",type:"text",def:"",mono:false},
+  ],
+  build(v){
+    const c=x=>`"${x.trim()}"`;
+    let parts=[v.r1, c(v.c1)];
+    if(v.r2.trim()&&v.c2.trim()) parts.push(v.r2, c(v.c2));
+    let f=`=COUNTIFS(${parts.join(", ")})`;
+    let ex=`Counts how many rows have <b>${v.r1}</b> equal to “${v.c1}”`+
+           (v.r2.trim()&&v.c2.trim()?` <b>and</b> <b>${v.r2}</b> equal to “${v.c2}”.`:`.`);
+    return {formula:f, explain:ex, where:"Use \">100\", \"<50\" or \"<>\" inside a condition for numeric or not-blank tests."};
+  }
+ },
+ {
+  id:"averageifs", label:"Average with conditions (AVERAGEIFS)", group:"Add / Count / Average",
+  keywords:["average","mean","averageif","averageifs","avg"],
+  fields:[
+    {k:"avg",label:"Column of numbers to average",type:"text",def:"C2:C100",mono:true},
+    {k:"r1",label:"Column to test (condition 1)",type:"text",def:"A2:A100",mono:true},
+    {k:"c1",label:"Condition 1",type:"text",def:"Nepal",mono:false},
+    {k:"r2",label:"Column to test (condition 2 — optional)",type:"text",def:"",mono:true},
+    {k:"c2",label:"Condition 2 (optional)",type:"text",def:"",mono:false},
+  ],
+  build(v){
+    const c=x=>`"${x.trim()}"`;
+    let parts=[v.avg, v.r1, c(v.c1)];
+    if(v.r2.trim()&&v.c2.trim()) parts.push(v.r2, c(v.c2));
+    let f=`=AVERAGEIFS(${parts.join(", ")})`;
+    let ex=`Averages <b>${v.avg}</b> only for rows where <b>${v.r1}</b> is “${v.c1}”`+
+           (v.r2.trim()&&v.c2.trim()?` and <b>${v.r2}</b> is “${v.c2}”.`:`.`);
+    return {formula:f, explain:ex, where:"Like SUMIFS, the range to average comes first, then range/condition pairs."};
+  }
+ },
+ {
+  id:"if", label:"Make a decision (IF)", group:"Logic",
+  keywords:["if","condition","decision","pass","fail","greater","then"],
+  fields:[
+    {k:"cell",label:"Cell to test",type:"text",def:"B2",mono:true},
+    {k:"op",label:"Test",type:"select",def:">=",opts:[[">=","is greater than or equal to"],[">","is greater than"],["<","is less than"],["<=","is less than or equal to"],["=","equals"]]},
+    {k:"comp",label:"Compare to",hint:"number or \"text\"",type:"text",def:"50",mono:false},
+    {k:"yes",label:"Show this if true",type:"text",def:"Pass",mono:false},
+    {k:"no",label:"Show this if false",type:"text",def:"Fail",mono:false},
+  ],
+  build(v){
+    const isNum=s=>s.trim()!==""&&!isNaN(s.trim());
+    const wrap=s=>isNum(s)?s.trim():`"${s.trim()}"`;
+    let comp = isNum(v.comp)? v.comp.trim() : (v.op==="="? `"${v.comp.trim()}"` : `"${v.comp.trim()}"`);
+    let f=`=IF(${v.cell}${v.op}${comp}, ${wrap(v.yes)}, ${wrap(v.no)})`;
+    let ex=`Checks whether <b>${v.cell}</b> ${({">=":"is ≥",">":"is >","<":"is <","<=":"is ≤","=":"equals"})[v.op]} <b>${v.comp}</b>. If yes it shows “${v.yes}”, otherwise “${v.no}”.`;
+    return {formula:f, explain:ex, where:"For more than two outcomes, nest another IF in place of the false value, or use IFS on Excel 2019+."};
+  }
+ },
+ {
+  id:"iferror", label:"Hide errors (IFERROR)", group:"Logic",
+  keywords:["iferror","error","#n/a","div/0","hide error","na"],
+  fields:[
+    {k:"formula",label:"Your existing formula",hint:"paste the one that errors",type:"text",def:"VLOOKUP(A2,$F$2:$H$100,3,FALSE)",mono:true},
+    {k:"alt",label:"Show this instead of an error",hint:"leave blank for empty",type:"text",def:"",mono:false},
+  ],
+  build(v){
+    let inner=v.formula.trim().replace(/^=/,"");
+    let alt=v.alt.trim()===""?`""`:`"${v.alt.trim()}"`;
+    let f=`=IFERROR(${inner}, ${alt})`;
+    let ex=`Runs your formula, but if it returns any error (like #N/A or #DIV/0!) it shows ${v.alt.trim()===""?"a blank cell":`“${v.alt.trim()}”`} instead.`;
+    return {formula:f, explain:ex, where:"Get your formula working correctly first — IFERROR hides genuine mistakes too, so add it last."};
+  }
+ },
+ {
+  id:"clean", label:"Clean text (spaces &amp; case)", group:"Text",
+  keywords:["clean","trim","spaces","proper","upper","lower","case","tidy text"],
+  fields:[
+    {k:"cell",label:"Cell to clean",type:"text",def:"A2",mono:true},
+    {k:"case",label:"Change the case?",type:"select",def:"none",opts:[["none","Keep as is"],["PROPER","Title Case"],["UPPER","UPPERCASE"],["LOWER","lowercase"]]},
+  ],
+  build(v){
+    let f = v.case==="none" ? `=TRIM(${v.cell})` : `=${v.case}(TRIM(${v.cell}))`;
+    let ex=`TRIM removes extra spaces from <b>${v.cell}</b>`+
+           (v.case==="none"?`.`:`, then ${v.case} sets it to ${({PROPER:"Title Case",UPPER:"UPPERCASE",LOWER:"lowercase"})[v.case]}.`);
+    return {formula:f, explain:ex, where:"Put this in a helper column, then Paste Special ▸ Values over the original to keep the cleaned text."};
+  }
+ },
+ {
+  id:"combine", label:"Combine text from cells", group:"Text",
+  keywords:["combine","join","concatenate","merge text","textjoin","full name","together"],
+  fields:[
+    {k:"cells",label:"Cells to join (comma-separated)",hint:"e.g. A2, B2, C2",type:"text",def:"A2, B2",mono:true},
+    {k:"sep",label:"Separator between them",hint:"e.g. a space, comma, dash",type:"text",def:" ",mono:false},
+  ],
+  build(v){
+    let list=v.cells.split(",").map(s=>s.trim()).filter(Boolean);
+    let f=`=TEXTJOIN("${v.sep}", TRUE, ${list.join(", ")})`;
+    let ex=`Joins ${list.map(x=>`<b>${x}</b>`).join(", ")} into one cell, separated by “${v.sep===" "?"a space":v.sep}”. The <code class="inl">TRUE</code> tells it to skip any empty cells.`;
+    return {formula:f, explain:ex, where:"On older Excel, use the & operator instead: "+list.join(' & "'+v.sep+'" & ')+". TEXTJOIN needs Excel 2019+."};
+  }
+ },
+ {
+  id:"extract", label:"Extract part of text", group:"Text",
+  keywords:["extract","left","right","mid","first characters","last characters","substring","part of"],
+  fields:[
+    {k:"cell",label:"Cell to extract from",type:"text",def:"A2",mono:true},
+    {k:"side",label:"Take from",type:"select",def:"LEFT",opts:[["LEFT","the start (left)"],["RIGHT","the end (right)"]]},
+    {k:"n",label:"How many characters",type:"text",def:"3",mono:true},
+  ],
+  build(v){
+    let f=`=${v.side}(${v.cell}, ${v.n})`;
+    let ex=`Takes the first <b>${v.n}</b> characters from ${v.side==="LEFT"?"the start":"the end"} of <b>${v.cell}</b>.`;
+    return {formula:f, explain:ex, where:"To grab from the middle, use MID(cell, start, count). To split by a delimiter instead, try Data ▸ Text to Columns or Flash Fill (Ctrl+E)."};
+  }
+ },
+];
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+const $=(s,el=document)=>el.querySelector(s);
+const $$=(s,el=document)=>[...el.querySelectorAll(s)];
+
+/* icon helper */
+function svg(inner,w=18){return `<svg width="${w}" height="${w}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${inner}</svg>`;}
+
+/* ---- tabs ---- */
+const nav=$("#nav");
+TABS.forEach(t=>{
+  const b=document.createElement("button");
+  b.className="tab"+(t.id==="home"?" active":"");
+  b.dataset.tab=t.id;
+  b.innerHTML=`<span class="ico">${svg(t.icon)}</span>${t.label}`;
+  b.addEventListener("click",()=>go(t.id));
+  nav.appendChild(b);
+});
+function go(id){
+  $$(".view").forEach(v=>v.classList.remove("active"));
+  $("#view-"+id).classList.add("active");
+  $$(".tab").forEach(t=>t.classList.toggle("active",t.dataset.tab===id));
+  document.body.classList.remove("nav-open");
+  window.scrollTo({top:0,behavior:"instant" in window?"instant":"auto"});
+}
+$$("[data-goto]").forEach(el=>el.addEventListener("click",()=>go(el.dataset.goto)));
+
+/* mobile nav */
+$("#hamburger").addEventListener("click",()=>document.body.classList.toggle("nav-open"));
+$("#backdrop").addEventListener("click",()=>document.body.classList.remove("nav-open"));
+
+/* ---- home: typing demo ---- */
+const demoLines=['=XLOOKUP(A2, Products, Prices)','=SUMIFS(Sales, Region, "Nepal")','=IFERROR(VLOOKUP(A2,tbl,3,0),"—")','=TRIM(PROPER(A2))'];
+(function typeDemo(){
+  const el=$("#demoType"); if(!el) return;
+  let li=0;
+  function loop(){
+    const line=demoLines[li%demoLines.length]; let i=0;
+    const t=setInterval(()=>{
+      el.textContent=line.slice(0,i++);
+      if(i>line.length){clearInterval(t);setTimeout(()=>{
+        const e=setInterval(()=>{el.textContent=line.slice(0,line.length-(++i-line.length));
+          if(el.textContent.length===0){clearInterval(e);li++;setTimeout(loop,250);}},22);
+      },1500);}
+    },55);
+  }
+  loop();
+})();
+
+/* ---- course lessons ---- */
+const lessonList=$("#lessonList");
+let curTrack="all", curSearch="";
+function renderLessons(){
+  const q=curSearch.toLowerCase().trim();
+  const shown=LESSONS.filter(l=>{
+    const trackOk = curTrack==="all" ? true : curTrack==="mba" ? l.track==="mba" : l.track==="bba";
+    const text=(l.title+" "+l.tag+" "+l.what+" "+l.uses.join(" ")).toLowerCase();
+    return trackOk && (q===""||text.includes(q));
+  });
+  if(!shown.length){lessonList.innerHTML=`<div class="empty">${svg('<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>',34)}<p>No lessons match that. Try another word, or switch track.</p></div>`;return;}
+  lessonList.innerHTML=shown.map((l,idx)=>{
+    const badge = l.track==="mba"
+      ? `<span class="chip chip-mba">MBA</span>`
+      : `<span class="chip chip-bba">BBA</span>`;
+    const uses=l.uses.map(u=>`<span>${u}</span>`).join("");
+    const steps=l.steps.map(s=>`<li>${s}</li>`).join("");
+    return `<div class="lesson">
+      <div class="lesson-head">
+        <span class="lesson-num">${String(idx+1).padStart(2,"0")}</span>
+        <div class="lesson-title"><h3>${l.title}</h3><div class="tag-line">${l.tag}</div></div>
+        <div class="lesson-badges">${badge}</div>
+        <span class="lesson-toggle">${svg('<path d="M6 9l6 6 6-6"/>')}</span>
+      </div>
+      <div class="lesson-body"><div class="lesson-body-inner"><div class="lesson-content">
+        <h4>What it's for</h4>
+        <p>${l.what}</p>
+        <div class="uses">${uses}</div>
+        <h4>Step by step</h4>
+        <ol class="steps">${steps}</ol>
+        <h4>Example</h4>
+        <div class="formula"><span class="fx">${l.formula.startsWith("=")?"":""}</span>${escapeHtml(l.formula)}</div>
+        <p style="font-size:13px;color:var(--muted);margin-top:8px">${l.formulaCaption}</p>
+        <div class="callout">${svg('<path d="M12 9v4M12 17h.01M10.3 3.3l-8 14A2 2 0 0 0 4 20h16a2 2 0 0 0 1.7-2.7l-8-14a2 2 0 0 0-3.4 0z"/>',18)}<div><b>Watch out:</b> ${l.watch}</div></div>
+      </div></div></div>
+    </div>`;
+  }).join("");
+  $$(".lesson-head",lessonList).forEach(h=>h.addEventListener("click",()=>h.parentElement.classList.toggle("open")));
+}
+function escapeHtml(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+$$("#trackSeg button").forEach(b=>b.addEventListener("click",()=>{
+  $$("#trackSeg button").forEach(x=>x.classList.remove("on"));b.classList.add("on");
+  curTrack=b.dataset.track;renderLessons();
+}));
+$("#courseSearch").addEventListener("input",e=>{curSearch=e.target.value;renderLessons();});
+renderLessons();
+
+/* ---- shortcuts ---- */
+const scList=$("#scList");
+let curOS="win", scQuery="";
+function keyHtml(keys){return keys.map((k,i)=>`${i?'<span class="plus">+</span>':''}<kbd>${k}</kbd>`).join("");}
+function renderShortcuts(){
+  const q=scQuery.toLowerCase().trim();
+  let html="";
+  SC.forEach(cat=>{
+    const items=cat.items.filter(it=>q===""||it.d.toLowerCase().includes(q)||(it[curOS].join(" ").toLowerCase().includes(q)));
+    if(!items.length) return;
+    html+=`<div class="sc-cat">
+      <div class="sc-cat-head"><span class="ci">${svg(cat.icon,18)}</span><h3>${cat.cat}</h3><span>${items.length}</span></div>
+      <div class="sc-list">${items.map(it=>`<div class="sc"><span class="desc">${it.d}</span><span class="keys">${keyHtml(it[curOS])}</span></div>`).join("")}</div>
+    </div>`;
+  });
+  scList.innerHTML=html||`<div class="empty">${svg('<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>',34)}<p>No shortcut matches that.</p></div>`;
+}
+$$("#osSeg button").forEach(b=>b.addEventListener("click",()=>{
+  $$("#osSeg button").forEach(x=>x.classList.remove("on"));b.classList.add("on");
+  curOS=b.dataset.os;renderShortcuts();
+}));
+$("#scSearch").addEventListener("input",e=>{scQuery=e.target.value;renderShortcuts();});
+renderShortcuts();
+/* count for home stat */
+$("#statShortcuts").textContent=SC.reduce((n,c)=>n+c.items.length,0);
+$("#statLessons").textContent=LESSONS.length;
+$("#statFormulas").textContent=RECIPES.length;
+
+/* ---- tips ---- */
+$("#tipsGrid").innerHTML=TIPS.map((t,i)=>`
+  <div class="tip"><div class="tip-n">TIP ${String(i+1).padStart(2,"0")}</div>
+  <h4>${t.t}</h4><p>${t.b}</p><span class="tag">${t.tag}</span></div>`).join("");
+
+/* ============================================================
+   FORMULA GENERATOR
+   ============================================================ */
+const taskSel=$("#fgTask");
+const fieldsBox=$("#fgFields");
+const outBox=$("#fgOut");
+const explainBox=$("#fgExplain");
+let curRecipe=RECIPES[0];
+
+/* populate task dropdown grouped */
+(function(){
+  const groups={};
+  RECIPES.forEach(r=>{(groups[r.group]=groups[r.group]||[]).push(r);});
+  Object.keys(groups).forEach(g=>{
+    const og=document.createElement("optgroup");og.label=g;
+    groups[g].forEach(r=>{const o=document.createElement("option");o.value=r.id;o.innerHTML=r.label;og.appendChild(o);});
+    taskSel.appendChild(og);
+  });
+})();
+
+function renderFields(){
+  fieldsBox.innerHTML=curRecipe.fields.map(f=>{
+    if(f.type==="select"){
+      const opts=f.opts.map(o=>`<option value="${o[0]}" ${o[0]===f.def?"selected":""}>${o[1]}</option>`).join("");
+      return `<div class="field"><label>${f.label}${f.hint?`<span class="hint">${f.hint}</span>`:""}</label><select data-k="${f.k}">${opts}</select></div>`;
+    }
+    return `<div class="field"><label>${f.label}${f.hint?`<span class="hint">${f.hint}</span>`:""}</label><input type="text" data-k="${f.k}" value="${f.def.replace(/"/g,'&quot;')}" class="${f.mono?'mono':''}" placeholder="${(f.def||'').replace(/"/g,'&quot;')}"></div>`;
+  }).join("");
+  $$("[data-k]",fieldsBox).forEach(inp=>inp.addEventListener("input",compute));
+  compute();
+}
+function readValues(){
+  const v={};
+  curRecipe.fields.forEach(f=>{v[f.k]=f.def;});
+  $$("[data-k]",fieldsBox).forEach(inp=>{v[inp.dataset.k]=inp.value;});
+  return v;
+}
+function colorFormula(f){
+  // simple syntax highlight: = , FUNCTION( , "strings"
+  let out=escapeHtml(f);
+  out=out.replace(/^=/,'<span class="eq">=</span>');
+  out=out.replace(/\b([A-Z]+)(?=\()/g,'<span class="fn">$1</span>');
+  out=out.replace(/&quot;([^&]*)&quot;/g,'<span class="ph">&quot;$1&quot;</span>');
+  return out;
+}
+function compute(){
+  const v=readValues();
+  let res;
+  try{res=curRecipe.build(v);}catch(e){res={formula:"= …",explain:"Fill in the fields above.",where:""};}
+  outBox.innerHTML=colorFormula(res.formula);
+  outBox.dataset.raw=res.formula;
+  explainBox.innerHTML=`<p>${res.explain}</p>`+(res.where?`<div class="where">${svg('<path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7z"/><circle cx="12" cy="9" r="2.5"/>',16)}<div>${res.where}</div></div>`:"");
+}
+taskSel.addEventListener("change",()=>{curRecipe=RECIPES.find(r=>r.id===taskSel.value);renderFields();});
+
+/* copy */
+$("#fgCopy").addEventListener("click",()=>{
+  const raw=outBox.dataset.raw||outBox.textContent;
+  navigator.clipboard?.writeText(raw).then(()=>{
+    const b=$("#fgCopy");b.classList.add("done");b.querySelector("svg").outerHTML=svg('<path d="M20 6L9 17l-5-5"/>',15);
+    b.childNodes[b.childNodes.length-1].textContent=" Copied!";
+    setTimeout(()=>{b.classList.remove("done");b.innerHTML=svg('<rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/>',15)+" Copy formula";},1600);
+  }).catch(()=>{});
+});
+
+/* smart search → pick recipe */
+const suggestions=[
+  {t:"Find a price from an ID",id:"vlookup"},
+  {t:"Count how many are “Nepal”",id:"countifs"},
+  {t:"Total sales for a region",id:"sumifs"},
+  {t:"Join first + last name",id:"combine"},
+  {t:"Hide #N/A errors",id:"iferror"},
+  {t:"Clean messy text",id:"clean"},
+];
+const fgSuggest=$("#fgSuggest");
+suggestions.forEach(s=>{
+  const p=document.createElement("button");p.className="pill";p.textContent=s.t;
+  p.addEventListener("click",()=>{selectRecipe(s.id);$("#fgSearch").value=s.t;});
+  fgSuggest.appendChild(p);
+});
+function selectRecipe(id){
+  curRecipe=RECIPES.find(r=>r.id===id)||RECIPES[0];
+  taskSel.value=curRecipe.id;renderFields();
+}
+$("#fgSearch").addEventListener("input",e=>{
+  const q=e.target.value.toLowerCase();
+  if(q.trim().length<2) return;
+  let best=null,score=0;
+  RECIPES.forEach(r=>{
+    let s=0;
+    r.keywords.forEach(k=>{if(q.includes(k))s+=k.length;});
+    if(r.label.toLowerCase().split(/\W+/).some(w=>w.length>2&&q.includes(w)))s+=2;
+    if(s>score){score=s;best=r;}
+  });
+  if(best&&score>0){curRecipe=best;taskSel.value=best.id;renderFields();}
+});
+
+/* init generator */
+renderFields();
+</script>
+</body>
+</html>
